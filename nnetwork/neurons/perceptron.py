@@ -2,6 +2,7 @@ import numpy as np
 from nnetwork.neurons.neuron import Neuron
 
 class PerceptronGD(Neuron):
+    """ Perceptron model that uses gradient descent. """
 
     def __init__(self, lr=0.01, n_epochs=10):
         self.__weights, self.__errors = [], []
