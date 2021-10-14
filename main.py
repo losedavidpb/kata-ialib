@@ -2,10 +2,11 @@ from sklearn import datasets
 import matplotlib.pyplot as plt
 import numpy as np
 
-from nnetwork.neurons import adaline, perceptron, mcCulloch_pitts as mp
+from nnetwork.neurons import adaline
+from nnetwork.neurons import perceptron
+from nnetwork.neurons import mcCulloch_pitts as mp
 
-# _________________ Global variables _________________
-
+# region _________________ Global variables _________________
 p_x_1 = np.array([
     [0.023, 0.112], [0.255, 0.111], [0.312, 0.234],
     [0.486, 0.533], [0.243, 0.335], [0.722, 0.545],
@@ -28,9 +29,9 @@ p_y_1 = np.array([
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 ])
+# endregion
 
-# _________________ Visualization functions _________________
-
+# region _________________ Visualization functions _________________
 def _visualize_dataset(x, y):
     plt.figure()
     plt.scatter(x[:, 0], x[:, 1], c=y)
@@ -40,9 +41,6 @@ def _visualize_dataset(x, y):
 
 def _visualize_model(x, y, model):
     weights = model.best_weights()
-
-    print(x)
-    print(model.predict(x, is_trained=True))
 
     # X values for line that represents the prediction
     start_p, stop_p = min(x[:, 0]), max(x[:, 0]) + 1
@@ -66,9 +64,9 @@ def _visualize_errors(errors):
     plt.xlabel("Iterations")
     plt.ylabel("Error (SSE)")
     plt.grid(), plt.show()
+# endregion
 
-# ____________________ Tests for simple neurons  ____________________
-
+# region ____________________ Tests for simple neurons  ____________________
 def test_mcCulloch_pitts():
     p_x = np.array([[2.0, 3.0], [4.0, 1.0], [3.0, 1.0]])
     w = np.random.randint(low=-1, high=1, size=(p_x.shape[1]))
@@ -130,10 +128,15 @@ def test_2_perceptron():
 
     _visualize_errors(errors)
     _visualize_model(x, y, model)
+# endregion
 
 if __name__ == '__main__':
+    print("***************************** Tests for simple neurons *****************************")
+    print(">> McCulloch-Pitts neuron")
     test_mcCulloch_pitts()
+    print(">> Adaline neuron")
     test_1_adaline()
     test_2_adaline()
+    print(">> Perceptron neuron")
     test_1_perceptron()
     test_2_perceptron()
