@@ -4,6 +4,7 @@ import abc
 # _____________________ BackPropagation with Gradient Descent _____________________
 
 class BackPropagationGD(object):
+    """ BackPropagation with Gradient Descent """
 
     def __init__(self, layer_types, lr=0.01, n_epochs=10):
         self.__input_layer, self.__h_layers, self.__output_layer = None, None, None

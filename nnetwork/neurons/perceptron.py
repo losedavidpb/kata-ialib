@@ -1,6 +1,26 @@
 import numpy as np
 from nnetwork.neurons.neuron import Neuron
 
+"""
+    Perceptron is a binary lineal classifier, created by Frank Rosenblatt
+    in 1960, based on the operation and characteristics of biologic neurons.
+    This computational model is inspired by McCulloch-Pitts computing model,
+    and it is generally used for recognition and pattern classification.
+    
+    Perceptron's computational model can be divided into two sections:
+
+        * Net input function: process that returns a result depending on
+        the values of inputs and weights. This section generally is described
+        as the aggregation of the product of each weight and input.
+
+        * Activation function: makes the decision based on the result returned
+        by the net input function. It is commonly used the Sigmoid function.
+
+    It is important to notice that, unlike other computational models, the
+    Perceptron modifies its weights by the error produced on the output (Adaline's
+    computing model uses the error generated at the activation function layer).
+"""
+
 class PerceptronGD(Neuron):
     """ Perceptron model that uses gradient descent. """
 

@@ -5,6 +5,7 @@ import abc
 # _______________________ Madaline layer definition _______________________
 
 class LayerMadaline(Layer, abc.ABC):
+    """ Generalization of a layer for Madaline """
 
     def net_input(self, p_x, is_trained=True):
         return np.dot(p_x, super().__weights[:1, :]) + super().__weights[0, :]
@@ -18,16 +19,19 @@ class LayerMadaline(Layer, abc.ABC):
 # ________________ Madaline layer types ________________
 
 class InputLayerMadaline(LayerMadaline, InputLayer):
+    """ Input layer for Madaline """
 
     def predict(self, p_x, is_trained=True):
         return self.net_input(p_x, is_trained)
 
 class HiddenLayerMadaline(LayerMadaline, HiddenLayer):
+    """ Hidden layer for Madaline """
 
     def predict(self, p_x, is_trained=True):
         return self.activation_function(self.net_input(p_x, is_trained))
 
 class OutputLayerMadaline(LayerMadaline, OutputLayer):
+    """ Output layer for Madaline """
 
     def predict(self, p_x, is_trained=True):
         return self.quantization(self.activation_function(self.net_input(p_x, is_trained)))

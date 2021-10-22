@@ -1,5 +1,8 @@
 import tensorflow as tf
 
+# ___________________________ IN PROCESS ... ___________________________
+
+@NotImplemented
 class GrowingNeuralGas(object):
 
     def __init__(self, epsilon_b, epsilon_n, a_max, eta, alpha, delta, num_epochs=10):
@@ -42,6 +45,7 @@ class GrowingNeuralGas(object):
 
 
 # region Graph Implementation for GNG
+@NotImplemented
 class Graph(object):
 
     def __init__(self, identifier: int, neighborhood=[], age_neighborhood=[]):
