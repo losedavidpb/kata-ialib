@@ -18,6 +18,6 @@ class Neuron(abc.ABC):
     def predict(self, p_x):
         """ Execute prediction process for passed input values
 
-        :param p_x: Numpy array of input values
+        :param p_x: array of input values
         """
         pass
