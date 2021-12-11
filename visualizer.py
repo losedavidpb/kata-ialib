@@ -2,15 +2,7 @@ from abc import ABC, abstractmethod
 from matplotlib import pyplot as plt, animation
 import numpy as np
 from matplotlib.colors import get_named_colors_mapping
-
-# region ____________________ Private functions ____________________
-def _format_file_path_extension(file_path, extension):
-    if file_path is not None:
-        if not file_path.endswith('.' + extension):
-            file_path = file_path + '.' + extension
-
-    return file_path
-# endregion
+from utils import format_file_path_extension
 
 # region ____________________ Visualizer Interface ____________________
 class AnimationIA(ABC):
@@ -20,7 +12,7 @@ class AnimationIA(ABC):
         self.fig = plt.figure(1)
 
         self.file_path = kwargs.get('file_path', None)
-        self.file_path = _format_file_path_extension(self.file_path, 'gif')
+        self.file_path = format_file_path_extension(self.file_path, 'gif')
 
         self.interval_time = kwargs.get('interval_time', 500)
         self.num_frames_per_sec = kwargs.get('num_frames_per_sec', 3)
@@ -56,7 +48,7 @@ class PlotterIA(ABC):
         plt.clf()
         self.fig = plt.figure(1)
         self.file_path = kwargs.get('file_path', None)
-        self.file_path = _format_file_path_extension(self.file_path, 'jpg')
+        self.file_path = format_file_path_extension(self.file_path, 'jpg')
 
     @abstractmethod
     def init(self, **kwargs):

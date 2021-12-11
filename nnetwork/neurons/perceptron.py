@@ -1,5 +1,6 @@
 import numpy as np
 from nnetwork.neurons.neuron import Neuron
+from utils import get_decimal_format
 
 """
     Perceptron is a binary lineal classifier, created by Frank Rosenblatt
@@ -52,15 +53,17 @@ class PerceptronGD(Neuron):
 
         for epoch in range(0, self.__n_epochs):
             if self.__verbose is True:
-                print(str.format("Epoch {}: Error={}", epoch, format(self.__history['errors'][-1], '.4f')))
+                f_error = get_decimal_format(self.__history['errors'][-1])
+                print(str.format("Epoch {}: Error={}", epoch, f_error))
 
             v_errors = p_y - self.predict(p_x, is_trained=False)
             self._update_weights(p_x, v_errors)
+            v_errors = p_y - self.predict(p_x, is_trained=False)
             self.__history['errors'].append(self._error(v_errors))
 
             if len(self.__history['errors']) >= 2:
-                prev_error = self.__history['errors'][len(self.__history['errors']) - 2]
-                last_error = self.__history['errors'][len(self.__history['errors']) - 1]
+                prev_error = self.__history['errors'][-2]
+                last_error = self.__history['errors'][-1]
 
                 if prev_error <= last_error:
                     num_tries = num_tries + 1
@@ -77,14 +80,15 @@ class PerceptronGD(Neuron):
     def _best_weight(self):
         errors = self.__history['errors']
         index_min = min(range(len(errors)), key=errors.__getitem__)
-        self.__best_weights = self.__history['weights'][index_min]
+        self.__best_weights = np.array(self.__history['weights'][index_min])
 
     def _init_weights(self, p_x):
         self.__history['weights'].clear()
+        self.__history = {'weights': [], 'errors': []}
         self.__history['weights'].append(np.random.random(size=p_x.shape[1] + 1))
 
     def _update_weights(self, p_x, v_errors):
-        last_w = np.array(self.__history['weights'][len(self.__history['weights']) - 1])
+        last_w = np.array(self.__history['weights'][-1])
 
         # Weights will be updated taking into account that the result is an array
         last_w[1:] = last_w[1:] + self.__lr * p_x.T.dot(v_errors)
@@ -101,7 +105,7 @@ class PerceptronGD(Neuron):
         return (v_errors ** 2).sum() / v_errors.shape[0]
 
     def _net_input(self, p_x, is_trained=True):
-        last_w = self.__best_weights if is_trained else self.__history['weights'][len(self.__history['weights']) - 1]
+        last_w = np.array(self.__best_weights if is_trained else self.__history['weights'][-1])
         return np.dot(p_x, last_w[1:]) + last_w[0]
 
     @staticmethod
