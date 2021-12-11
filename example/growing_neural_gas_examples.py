@@ -13,8 +13,6 @@ def test_gng_1():
     iris = iris.data[:, :]
 
     train_data, test_data = prepare_data(iris, remove_class=False)
-    train_data = tf.Variable(train_data, dtype=tf.float32)
-    test_data = tf.Variable(test_data, dtype=tf.float32)
 
     model = GrowingNeuralGas(
         epsilon_a=.1, epsilon_n=.05, a_max=5, eta=25, alpha=.1, delta=.1,
@@ -37,8 +35,6 @@ def test_gng_2():
     cancer = cancer.data[:, :]
 
     train_data, test_data = prepare_data(cancer, remove_class=False)
-    train_data = tf.Variable(train_data, dtype=tf.float32)
-    test_data = tf.Variable(test_data, dtype=tf.float32)
 
     model = GrowingNeuralGas(
         epsilon_a=.1, epsilon_n=.05, a_max=5, eta=25, alpha=.1, delta=.1,

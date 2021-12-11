@@ -37,12 +37,12 @@ def test_1_perceptron():
 
     # Perceptron neuron works better for the classification of two classes,
     # since it was designed as a binary classifier
-    model = perceptron.PerceptronGD(lr=0.01, n_epochs=30)
-    history = model.fit(p_x_1, p_y_1, max_tries=2)
+    model = perceptron.PerceptronGD(lr=0.001, n_epochs=2000)
+    history = model.fit(p_x_1, p_y_1, max_tries=4)
 
     ErrorPlotter().init(errors=history['errors']).show()
-    NeuronPlotter().init(x=p_x_1, y=p_y_1, weights=history['weights'][-1]).show()
-    NeuronAnimation().init(x=p_x_1, y=p_y_1, weights=history['weights'], errors=history['errors']).show()
+    NeuronPlotter().init(x=p_x_1, y=p_y_1, model=model).show()
+    NeuronAnimation().init(x=p_x_1, y=p_y_1, model=model).show()
 
 def test_2_perceptron():
     print(">> Test Perceptron: iris")
@@ -55,12 +55,12 @@ def test_2_perceptron():
 
     TwoDimensionDataPlotter().init(x=x, y=y).show()
 
-    model = perceptron.PerceptronGD(lr=0.001, n_epochs=100)
+    model = perceptron.PerceptronGD(lr=0.001, n_epochs=1000)
     history = model.fit(x, y, max_tries=2)
 
     ErrorPlotter().init(errors=history['errors']).show()
-    NeuronPlotter().init(x=x, y=y, weights=history['weights'][-1]).show()
-    NeuronAnimation().init(x=x, y=y, weights=history['weights'], errors=history['errors']).show()
+    NeuronPlotter().init(x=x, y=y, model=model).show()
+    NeuronAnimation().init(x=x, y=y, model=model).show()
 
 if __name__ == '__main__':
     test_1_perceptron()

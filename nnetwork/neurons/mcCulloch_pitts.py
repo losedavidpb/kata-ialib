@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 
 class MPNeuron(object):
     """
@@ -34,7 +35,9 @@ class MPNeuron(object):
         self.__theta = theta
 
     def predict(self, weights, inputs):
-        net = np.sum(weights * inputs) - self.__theta
+        _weights = np.array(weights.numpy() if tf.is_tensor(weights) else weights)
+        _inputs = np.array(inputs.numpy() if tf.is_tensor(inputs) else inputs)
+        net = np.sum(_weights * _inputs) - self.__theta
         return self.activation_f(net)
 
     def activation_f(self, u):

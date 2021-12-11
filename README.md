@@ -19,12 +19,12 @@ x = iris.data[:, :2]
 y = iris.target
 x, y = x[y != 2], y[y != 2]
     
-model = PerceptronGD(lr=0.001, n_epochs=50)
+model = PerceptronGD(lr=0.01, n_epochs=50)
 history = model.fit(x, y)
 
 ErrorPlotter().init(errors=history['errors']).show()
-NeuronPlotter().init(x=x, y=y, weights=history['weights'][-1]).show()
-NeuronAnimation().init(x=x, y=y, weights=history['weights'], errors=history['errors']).show()
+NeuronPlotter().init(x=x, y=y, model=model).show()
+NeuronAnimation().init(x=x, y=y, model=model).show()
 ```
 
 ![](data/readme/perceptron.gif)
@@ -35,18 +35,21 @@ NeuronAnimation().init(x=x, y=y, weights=history['weights'], errors=history['err
 from nnetwork.neurons.adaline import AdalineGD
 from visualizer import ErrorPlotter, NeuronPlotter, NeuronAnimation
 from sklearn import datasets
+import preprocessing
+import numpy as np
 
 iris = datasets.load_iris()
-x = iris.data[:, :2]
-y = iris.target
-x, y = x[y != 2], y[y != 2]
+x, y = iris['data'], iris['target']
+
+x = preprocessing.normalize_data(x[50:150, :2])
+y = np.where(y[50:150] == 2, -1, y[50:150])
     
-model = AdalineGD(lr=0.0001, n_epochs=400)
+model = AdalineGD(lr=0.01, n_epochs=50)
 history = model.fit(x, y)
 
 ErrorPlotter().init(errors=history['errors']).show()
-NeuronPlotter().init(x=x, y=y, weights=history['weights'][-1]).show()
-NeuronAnimation().init(x=x, y=y, weights=history['weights'], errors=history['errors']).show()
+NeuronPlotter().init(x=x, y=y, model=model).show()
+NeuronAnimation().init(x=x, y=y, model=model).show()
 ```
 
 ![](data/readme/adaline.gif)

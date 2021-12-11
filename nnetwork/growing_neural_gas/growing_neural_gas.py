@@ -2,6 +2,8 @@ import time
 import numpy as np
 import tensorflow as tf
 from nnetwork.growing_neural_gas.gng_graph import GraphGNG
+from utils import get_decimal_format
+
 
 class GrowingNeuralGas(object):
 
@@ -106,12 +108,14 @@ class GrowingNeuralGas(object):
         return tf.Variable(tf.reduce_mean(error)).numpy()
 
     def predict(self, test_x):
+        _test_x = tf.Variable(test_x, dtype=tf.float32)
+
         n, a = self.history['n'][-1], self.history['a'][-1]
         clusters = self.history['clusters'][-1]
         predicted_clusters = []
 
-        for i in tf.range(0, test_x.shape[0]):
-            xi = test_x[i]
+        for i in tf.range(0, _test_x.shape[0]):
+            xi = _test_x[i]
 
             nearest_index = GrowingNeuralGas.find_nearest_unit(xi, a)
             cluster_arr = [c for c in range(0, len(clusters.keys())) if n[nearest_index].identifier in clusters[c]]
@@ -123,11 +127,13 @@ class GrowingNeuralGas(object):
         return predicted_clusters
 
     def fit(self, training_x):
+        _training_x = tf.Variable(training_x, dtype=tf.float32)
+
         str_format = "Epoch {}: num_clusters={}, number_units={}, error={}"
 
         self.history.clear()
         self.history = {'a': [], 'n': [], 'errors': [], 'clusters': []}
-        self.history['a'].append(tf.Variable(tf.random.normal([2, training_x.shape[1]], 0.0, 1.0, dtype=tf.float32)))
+        self.history['a'].append(tf.Variable(tf.random.normal([2, _training_x.shape[1]], 0.0, 1.0, dtype=tf.float32)))
         self.history['n'].append([GraphGNG(0), GraphGNG(1)])
         self.history['errors'].append(tf.Variable(tf.zeros([2, 1]), dtype=tf.float32))
         epoch, number_processed_row, num_clusters = 0, 0, 1
@@ -141,7 +147,7 @@ class GrowingNeuralGas(object):
             for graph in self.history['n'][epoch]:
                 n.append(graph.__copy__())
 
-            shuffled_training_x = tf.random.shuffle(training_x)
+            shuffled_training_x = tf.random.shuffle(_training_x)
 
             for row_ in tf.range(shuffled_training_x.shape[0]):
                 if self.verbose is True:
@@ -213,7 +219,8 @@ class GrowingNeuralGas(object):
                 print('\r\x1b[2K' + "Epoch " + str(epoch) + ": 100%", end='')
                 time.sleep(0.001)
 
-                print('\r\x1b[2K' + str.format(str_format, epoch, num_clusters, a.shape[0], format(error_mean, '.4f')))
+                error_mean = get_decimal_format(error_mean)
+                print('\r\x1b[2K' + str.format(str_format, epoch, num_clusters, a.shape[0], error_mean))
 
             self.history['a'][epoch] = tf.Variable(a)
             self.history['n'][epoch] = [graph.__copy__() for graph in n]

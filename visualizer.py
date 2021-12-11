@@ -2,7 +2,8 @@ from abc import ABC, abstractmethod
 from matplotlib import pyplot as plt, animation
 import numpy as np
 from matplotlib.colors import get_named_colors_mapping
-from utils import format_file_path_extension
+from utils import format_file_path_extension, get_decimal_format
+
 
 # region ____________________ Visualizer Interface ____________________
 class AnimationIA(ABC):
@@ -106,25 +107,32 @@ class NeuronPlotter(PlotterIA):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.x, self.y = None, None
-        self.weights, self.x_line = None, None
+        self.model = None
 
     def init(self, **kwargs):
         self.x, self.y = kwargs.get('x'), kwargs.get('y')
-        self.weights = kwargs.get('weights')
-        self.x_line = np.arange(min(self.x[:, 0]), max(self.x[:, 0]) + 1)
-        self.fig.clear()
-        plt.grid(b=True)
+        self.model = kwargs.get('model')
+        self.fig.clear(), plt.grid(b=True)
         return self
 
     def show(self):
-        line_data = (lambda m, n, _x: m * _x + n)(
-            m=self.weights[1] / -self.weights[2],
-            n=self.weights[0] / -self.weights[2],
-            _x=self.x_line
-        )
+        x_min, x_max = self.x[:, 0].min() - 1, self.x[:, 0].max() + 1
+        y_min, y_max = self.x[:, 1].min() - 1, self.x[:, 1].max() + 1
+        _x, _y = np.arange(x_min, x_max, .02), np.arange(y_min, y_max, .02)
+        xx, yy = np.meshgrid(_x, _y)
 
+        _w = self.model.history['weights'][-1]
+        m, n = _w[1] / -_w[2], _w[0] / -_w[2]
+        y_w = m * _x + n
+
+        Z = self.model.predict(np.c_[xx.ravel(), yy.ravel()])
+        Z = Z.reshape(xx.shape)
+        plt.contourf(xx, yy, Z, alpha=.25)
+        curr_axis = plt.axis()
         plt.scatter(self.x[:, 0], self.x[:, 1], c=self.y)
-        plt.plot(self.x_line, line_data)
+        plt.plot(_x, y_w, 'k--')
+        plt.axis(curr_axis)
+
         plt.title("Optimal model visualization")
         plt.xlabel("x"), plt.ylabel("y")
         plt.grid(b=True), plt.show()
@@ -180,35 +188,43 @@ class NeuronAnimation(AnimationIA):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.x, self.y = None, None
-        self.weights, self.x_line = None, None
-        self.errors = None
+        self.model = None
 
     def init(self, **kwargs):
         self.x, self.y = kwargs.get('x'), kwargs.get('y')
-        self.weights = kwargs.get('weights')
-        self.errors = kwargs.get('errors')
-        self.x_line = np.arange(min(self.x[:, 0]), max(self.x[:, 0]) + 1)
-        self.num_frames = len(self.weights)
-        self.fig.clear()
-        plt.grid(b=True)
+        self.model = kwargs.get('model')
+        self.num_frames = len(self.model.history['weights'])
+        self.fig.clear(), plt.grid(b=True)
         return self
 
     def update(self, frame):
         if self.num_frames < frame: return
 
         self.fig.clear()
-        _weights = self.weights[frame]
-        _error = self.errors[frame]
+        _error = self.model.history['errors'][frame]
+        _accuracy = self.model.history['accuracy'][frame]
 
-        line_data = (lambda m, n, _x: m * _x + n)(
-            m=_weights[1] / -_weights[2],
-            n=_weights[0] / -_weights[2],
-            _x=self.x_line
-        )
+        error_ = get_decimal_format(_error)
+        accuracy_ = get_decimal_format(_accuracy)
 
+        x_min, x_max = self.x[:, 0].min() - 1, self.x[:, 0].max() + 1
+        y_min, y_max = self.x[:, 1].min() - 1, self.x[:, 1].max() + 1
+        _x, _y = np.arange(x_min, x_max, .02), np.arange(y_min, y_max, .02)
+        xx, yy = np.meshgrid(_x, _y)
+
+        _w = self.model.history['weights'][frame]
+        m, n = _w[1] / -_w[2], _w[0] / -_w[2]
+        y_w = m * _x + n
+
+        Z = self.model.predict(np.c_[xx.ravel(), yy.ravel()], num_epoch=frame)
+        Z = Z.reshape(xx.shape)
+        plt.contourf(xx, yy, Z, alpha=.25)
         plt.scatter(self.x[:, 0], self.x[:, 1], c=self.y)
-        plt.plot(self.x_line, line_data)
-        plt.title(str.format("Training evolution, Epoch={}, Error={}", frame, format(_error, '.4f')))
+        curr_axis = plt.axis()
+        plt.plot(_x, y_w, 'k--')
+        plt.axis(curr_axis)
+
+        plt.title(str.format("Training evolution, Epoch={}, Error={}, Accuracy={}", frame, error_, accuracy_))
         plt.xlabel("x"), plt.ylabel("y")
         plt.grid(b=True), plt.show()
 

@@ -3,19 +3,20 @@ from nnetwork.backpropagation import input_layer
 from nnetwork.backpropagation import hidden_layer
 from nnetwork.backpropagation import output_layer
 import numpy as np
+import tensorflow as tf
 
 class BackPropagation(object):
 
     def __init__(self, input_activation, hidden_activation, output_activation, eta=.01, num_epochs=50, num_batch=50):
         self.eta, self.num_epochs, self.num_batch = eta, num_epochs, num_batch
-        self.input_activation = self.init_activation_f(input_activation)
-        self.hidden_activation = self.init_activation_f(hidden_activation)
-        self.output_activation = self.init_activation_f(output_activation)
+        self.input_activation = self._init_activation_f(input_activation)
+        self.hidden_activation = self._init_activation_f(hidden_activation)
+        self.output_activation = self._init_activation_f(output_activation)
         self.input_layer, self.hidden_layers, self.output_layer = None, None, None
         self.history = {}
 
     @staticmethod
-    def init_activation_f(activation_name):
+    def _init_activation_f(activation_name):
         activation_f = get_activation(activation_name)
         derivative_activation_f = get_derivative_activation(activation_name)
         return [activation_f, derivative_activation_f]
@@ -83,15 +84,19 @@ class BackPropagation(object):
 
     @staticmethod
     def total_accuracy(predicted, test):
+        _predicted = np.array(predicted.numpy() if tf.is_tensor(predicted) else predicted)
         n_hits = len([1 for predicted, expected in zip(predicted, test) if predicted == expected])
         return np.round(n_hits * 100 / len(test), 2)
 
     @staticmethod
     def total_error(predicted, last_output):
-        return np.mean(np.square(np.subtract(predicted, last_output)))
+        _predicted = np.array(predicted.numpy() if tf.is_tensor(predicted) else predicted)
+        _last_output = np.array(last_output.numpy() if tf.is_tensor(last_output) else last_output)
+        return np.mean(np.square(np.subtract(_predicted, _last_output)))
 
     def predict(self, p_x):
-        v_Y_input_layer_ = self.input_layer.predict(p_x)
+        _p_x = np.array(p_x.numpy() if tf.is_tensor(p_x) else p_x)
+        v_Y_input_layer_ = self.input_layer.predict(_p_x)
         v_X_hidden_layer_ = v_Y_input_layer_
         v_Y_hidden_layer_ = None
 
@@ -104,25 +109,29 @@ class BackPropagation(object):
         return v_Y_output_layer_
 
     def fit(self, x_train, y_train, x_test, y_test, num_hidden_layers, num_neurons_hidden_layers=np.array([1])):
+        _x_train = np.array(x_train.numpy() if tf.is_tensor(x_train) else x_train)
+        _y_train = np.array(y_train.numpy() if tf.is_tensor(y_train) else y_train)
+        _x_test = np.array(x_test.numpy() if tf.is_tensor(x_test) else x_test)
+        _y_test = np.array(y_test.numpy() if tf.is_tensor(y_test) else y_test)
         str_format = "Epoch {}: accuracy={}%, loss={}%"
 
         self.history.clear()
         self.history = {'accuracy': [], 'error': []}
 
-        self._init_layers(y_train, num_hidden_layers, num_neurons_hidden_layers)
+        self._init_layers(_y_train, num_hidden_layers, num_neurons_hidden_layers)
 
         for epoch in range(0, self.num_epochs):
-            rand_pos = np.random.permutation(len(x_train))
-            x_train_i, y_train_i = x_train[rand_pos], y_train[rand_pos]
+            rand_pos = np.random.permutation(len(_x_train))
+            x_train_i, y_train_i = _x_train[rand_pos], _y_train[rand_pos]
 
             for batch in range(0, self.num_batch):
                 x_train_b, y_train_b = x_train_i[batch, :], y_train_i[batch, :]
                 self._forward_propagate(np.resize(a=x_train_b, new_shape=(1, len(x_train_b))))
                 self._backward_propagate(np.resize(a=y_train_b, new_shape=(1, len(y_train_b))))
 
-            prediction_x = self.predict(x_test)
-            self.history['error'].append(self.total_error(y_test, self.output_layer.last_output))
-            self.history['accuracy'].append(self.total_accuracy(prediction_x, y_test))
+            prediction_x = self.predict(_x_test)
+            self.history['error'].append(self.total_error(_y_test, self.output_layer.last_output))
+            self.history['accuracy'].append(self.total_accuracy(prediction_x, _y_test))
 
             accuracy_epoch = np.round(self.history['accuracy'][epoch], 4)
             error_epoch = np.round(self.history['error'][epoch], 4)

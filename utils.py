@@ -1,4 +1,5 @@
 def get_decimal_format(value):
+    if value == 0: return value
     f_value, num_decimals = format(value, '.4f'), 4
 
     while float(f_value) == 0:
