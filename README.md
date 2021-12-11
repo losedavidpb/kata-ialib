@@ -27,7 +27,7 @@ NeuronPlotter().init(x=x, y=y, weights=history['weights'][-1]).show()
 NeuronAnimation().init(x=x, y=y, weights=history['weights'], errors=history['errors']).show()
 ```
 
-![](https://github.com/losedavidpb/blob/master/data/readme/perceptron.gif)
+![](data/readme/perceptron.gif)
 
 ### Adaline Example
 
@@ -49,7 +49,7 @@ NeuronPlotter().init(x=x, y=y, weights=history['weights'][-1]).show()
 NeuronAnimation().init(x=x, y=y, weights=history['weights'], errors=history['errors']).show()
 ```
 
-![](https://github.com/losedavidpb/blob/master/data/readme/adaline.gif)
+![](data/readme/adaline.gif)
 
 ### Growing Neural Gas Example
 
@@ -71,4 +71,4 @@ GrowingNeuralGasPlotter().init(history=history).show()
 GrowingNeuralGasAnimation().init(history=history).show()
 ```
 
-![](https://github.com/losedavidpb/blob/master/data/readme/gng.gif)
+![](data/readme/gng.gif)
