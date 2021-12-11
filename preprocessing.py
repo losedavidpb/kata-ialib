@@ -12,13 +12,13 @@ def split_data(data, train_size=0.95, shuffle=True):
     return train_data, test_data
 
 def principal_components(data, remove_class=True):
-    data = pd.DataFrame(data).drop_duplicates().dropna()
-    if remove_class: data = data.drop('Class', axis=1)
-    data = np.array(data.iloc[:, :], dtype=np.float)
+    _data = pd.DataFrame(data).drop_duplicates().dropna()
+    if remove_class: _data = _data.drop('Class', axis=1)
+    _data = np.array(_data.iloc[:, :], dtype=float)
 
-    data = StandardScaler().fit_transform(data)
-    data = PCA(n_components=None).transform(data)
-    return data
+    _data = StandardScaler().fit_transform(_data)
+    _data = PCA(n_components=None).fit_transform(_data)
+    return _data
 
 def prepare_data(data, remove_class=True, train_size=.95, shuffle=True):
     data = principal_components(data, remove_class)

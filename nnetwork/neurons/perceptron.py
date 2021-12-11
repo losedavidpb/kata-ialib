@@ -24,11 +24,12 @@ from nnetwork.neurons.neuron import Neuron
 class PerceptronGD(Neuron):
     """ Perceptron model that uses gradient descent. """
 
-    def __init__(self, lr=0.01, n_epochs=10):
+    def __init__(self, lr=0.01, n_epochs=10, verbose=True):
         self.__history = {'weights': [], 'errors': []}
         self.__best_weights = None
         self.__n_epochs = n_epochs
         self.__lr = lr
+        self.__verbose = verbose
 
     def best_weights(self):
         return self.__best_weights
@@ -36,7 +37,11 @@ class PerceptronGD(Neuron):
     def fit(self, p_x, p_y, init_weights=True, max_tries=1):
         self.__history.clear()
         self.__history = {'weights': [], 'errors': []}
-        if init_weights is True: self._init_weights(p_x)
+
+        if init_weights is True:
+            self._init_weights(p_x)
+            v_errors = p_y - self.predict(p_x, is_trained=False)
+            self.__history['errors'].append(self._error(v_errors))
 
         # Best weights will have the minimum cost value
         self.__best_weights = self.__history['weights'][0]
@@ -45,7 +50,10 @@ class PerceptronGD(Neuron):
         # This value will reset weights whether they improve!
         num_tries = 0
 
-        for _ in range(0, self.__n_epochs):
+        for epoch in range(0, self.__n_epochs):
+            if self.__verbose is True:
+                print(str.format("Epoch {}: Error={}", epoch, format(self.__history['errors'][-1], '.4f')))
+
             v_errors = p_y - self.predict(p_x, is_trained=False)
             self._update_weights(p_x, v_errors)
             self.__history['errors'].append(self._error(v_errors))
@@ -76,7 +84,7 @@ class PerceptronGD(Neuron):
         self.__history['weights'].append(np.random.random(size=p_x.shape[1] + 1))
 
     def _update_weights(self, p_x, v_errors):
-        last_w = self.__history['weights'][len(self.__history['weights']) - 1]
+        last_w = np.array(self.__history['weights'][len(self.__history['weights']) - 1])
 
         # Weights will be updated taking into account that the result is an array
         last_w[1:] = last_w[1:] + self.__lr * p_x.T.dot(v_errors)
