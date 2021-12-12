@@ -15,9 +15,7 @@ def split_data(data, train_size=0.95, shuffle=True):
 
 def normalize_data(data):
     _data = np.array(data.numpy() if tf.is_tensor(data) else data)
-    standard_scaler = StandardScaler()
-    standard_scaler.fit(_data)
-    _data = standard_scaler.transform(_data)
+    _data = StandardScaler().fit_transform(_data)
     return _data
 
 def principal_components(data, remove_class=True):
@@ -27,7 +25,18 @@ def principal_components(data, remove_class=True):
     _data = np.array(_data.iloc[:, :], dtype=float)
 
     _data = normalize_data(_data)
-    _data = PCA(n_components=None).fit_transform(_data)
+
+    porc_info, num_components = 0, 2
+    components = None
+
+    while porc_info < 0.85 and num_components < _data.shape[1]:
+        pca = PCA(n_components=num_components)
+        components = pca.fit_transform(_data)
+        expl = pca.explained_variance_ratio_
+        porc_info = np.sum(expl[0:16])
+        num_components = num_components + 1
+
+    _data = np.array(components, dtype=float)
     return _data
 
 def prepare_data(data, remove_class=True, train_size=.95, shuffle=True):
